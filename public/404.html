@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>GitHub File Renderer</title>
+  <script>
+    // GitHub Pages SPA redirect
+    var seg = window.location.pathname.replace('/github_wraper_to_deploy', '');
+    var query = window.location.search.slice(1);
+    var hash = window.location.hash.slice(1);
+    window.location.replace(
+      window.location.origin + '/github_wraper_to_deploy/' +
+      (query ? '?' + query : '') +
+      (hash ? '#' + hash : '')
+    );
+  </script>
+</head>
+<body></body>
+</html>
