@@ -1,46 +1,64 @@
-# GitHub File Renderer
+<div align="center">
 
-A static web application that renders GitHub repository files directly in the browser — no backend required. Paste any GitHub URL pointing to an HTML, Markdown, CSS, XML or plain text file and get a fully rendered preview with all dependencies resolved.
+# 🌐 GitHub File Renderer
 
-**Live demo**: https://patchamama.github.io/GitHub-File-Renderer/
+**Render any GitHub file in the browser — HTML, Markdown, CSS, XML and more.**
+No backend. No setup. Just paste a URL.
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-patchamama.github.io-blue?style=for-the-badge&logo=github)](https://patchamama.github.io/GitHub-File-Renderer/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+[![Built with React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org)
+
+🔗 **[https://patchamama.github.io/GitHub-File-Renderer/](https://patchamama.github.io/GitHub-File-Renderer/)**
+
+</div>
 
 ---
 
 ## Why
 
-GitHub's file viewer shows raw source or a basic preview. This tool renders files **as they were meant to be seen**:
+GitHub's built-in viewer only shows raw source or a bare-bones preview — it was never designed to render full web pages. This means that **many GitHub repositories hosting HTML websites have no way to be previewed without deploying them elsewhere first**. If you want to see how the site actually looks, you'd normally need to clone the repo, install dependencies, and run a local server.
 
-- HTML files are rendered with their CSS and JavaScript fully loaded
-- Markdown files are rendered with images and working links
-- Navigation between files in the same repository works transparently
+**GitHub File Renderer solves that in one step**: paste the GitHub URL, and the page renders exactly as intended — with styles, scripts, images and navigation all working.
+
+- 🖼 HTML files render with CSS and JavaScript fully loaded
+- 📝 Markdown renders with images and clickable links
+- 🔗 Navigation between pages in the same repository works transparently
+- 🔒 Password-protected pages (SHA-256 hash pattern) prompt for a password before rendering
 
 ---
 
 ## How it works
 
-1. You paste a GitHub URL (blob or raw format)
-2. The app resolves it to a `raw.githubusercontent.com` URL
-3. For HTML files:
-   - The HTML is fetched and parsed
-   - All relative `<link>` (CSS) and `<script>` references are detected
-   - Each dependency is fetched individually and **inlined** into the document (required because GitHub's raw server sends `Content-Type: text/plain` and a restrictive CSP that prevents the browser from loading external resources)
-   - Image and video `src` attributes are rewritten to absolute raw URLs
-   - Internal links to other files in the same repo are intercepted and trigger a new render cycle
-4. For Markdown files: rendered via `marked` with images and links resolved to the correct raw URLs
-5. The final document is injected into a sandboxed `<iframe>`
+```
+GitHub URL  →  resolve to raw URL  →  fetch HTML  →  detect & fetch dependencies
+    →  inline CSS / JS  →  rewrite asset URLs  →  render in sandboxed iframe
+```
+
+1. The URL is parsed and normalized to a `raw.githubusercontent.com` address
+2. The file is fetched — CORS is permitted by GitHub's raw content server
+3. **For HTML files:**
+   - All `<link rel="stylesheet">` and `<script src>` references are detected
+   - Each dependency is fetched and **inlined** directly into the document
+     _(required because GitHub's raw server responds with `Content-Type: text/plain` and a restrictive CSP, which prevents the browser from loading external resources from within an iframe)_
+   - Image, video and audio `src` attributes are rewritten to absolute raw URLs
+   - Internal links to other files in the same repo are intercepted and trigger a new render cycle instead of navigating away
+4. **For Markdown files:** rendered via `marked` with a custom renderer that resolves images and repo-internal links
+5. The final self-contained document is injected into a sandboxed `<iframe>`
 
 ---
 
 ## Supported URL formats
 
 ```
-# GitHub blob URL
+# GitHub blob URL (copy directly from the browser address bar)
 https://github.com/owner/repo/blob/branch/path/to/file.html
 
-# Raw URL (refs/heads style)
+# Raw URL — refs/heads style
 https://raw.githubusercontent.com/owner/repo/refs/heads/branch/path/to/file.html
 
-# Raw URL (direct)
+# Raw URL — direct
 https://raw.githubusercontent.com/owner/repo/branch/path/to/file.html
 ```
 
@@ -48,19 +66,20 @@ https://raw.githubusercontent.com/owner/repo/branch/path/to/file.html
 
 ## Examples
 
-| File | URL |
+| Type | URL |
 |------|-----|
-| HTML with CSS + JS | `https://github.com/patchamama/Hapkido-Taekwondo-Trainingsvideos/blob/main/index.html` |
+| HTML site with CSS + JS | `https://github.com/patchamama/Hapkido-Taekwondo-Trainingsvideos/blob/main/index.html` |
+| Password-protected HTML | `https://github.com/patchamama/Hapkido-Taekwondo-Trainingsvideos/blob/main/docs/index.html` |
 | Markdown with image links | `https://github.com/patchamama/Hapkido-Taekwondo-Trainingsvideos/blob/main/README.md` |
 
 ---
 
 ## Supported file types
 
-| Extension | Rendering |
-|-----------|-----------|
-| `.html`, `.htm` | Full render with inlined CSS/JS, asset resolution, in-repo link navigation |
-| `.md`, `.markdown` | Rendered via `marked`, images and links resolved |
+| Extension | How it renders |
+|-----------|----------------|
+| `.html`, `.htm` | Full render — inlined CSS/JS, resolved assets, in-repo link navigation |
+| `.md`, `.markdown` | Rendered with `marked` — images and links resolved to raw GitHub URLs |
 | `.css` | Displayed as plain text |
 | `.xml` | Displayed as plain text |
 | Everything else | Displayed as plain text |
@@ -69,29 +88,34 @@ https://raw.githubusercontent.com/owner/repo/branch/path/to/file.html
 
 ## Tech stack
 
-- React 19 + TypeScript
-- Vite
-- Tailwind CSS + @tailwindcss/typography
-- TanStack Query (React Query) for fetching and caching
-- `marked` for Markdown rendering
-- GitHub Actions for deployment to GitHub Pages
+| Tool | Purpose |
+|------|---------|
+| React 19 + TypeScript | UI framework |
+| Vite | Build tool |
+| Tailwind CSS + Typography plugin | Styling |
+| TanStack Query | Fetching and caching remote files |
+| `marked` | Markdown rendering |
+| Web Crypto API (`crypto.subtle`) | SHA-256 password verification |
+| GitHub Actions | Automated deployment to GitHub Pages |
 
 ---
 
 ## Local development
 
 ```bash
+# Install dependencies
 npm install
+
+# Start dev server
 npm run dev
+# → http://localhost:5173/
 ```
 
-Then open `http://localhost:5173/github_wraper_to_deploy/`
-
 ```bash
-# Production build
+# Production build (outputs to docs/)
 npm run build
 
-# Preview production build
+# Preview the production build locally
 npm run preview
 ```
 
@@ -99,38 +123,43 @@ npm run preview
 
 ## Deployment
 
-The app is deployed automatically to GitHub Pages on every push to `main` via `.github/workflows/deploy.yml`.
+The app builds to the `docs/` folder. GitHub Pages serves it directly from that folder on the `main` branch.
 
-To deploy your own fork:
+**To deploy your own fork:**
 
-1. Push to GitHub
-2. Go to **Settings → Pages → Source** and select **GitHub Actions**
-3. The next push to `main` will trigger the deployment
+1. Fork this repository and push your changes
+2. Go to **Settings → Pages**
+3. Set **Source** to `Deploy from a branch` → `main` → `/docs`
+4. Your site will be live at `https://<your-username>.github.io/<repo-name>/`
+
+Alternatively, the included `.github/workflows/deploy.yml` supports deploying via **GitHub Actions** (Settings → Pages → Source: GitHub Actions).
 
 ---
 
 ## Known limitations
 
-- **Private repositories**: not supported — only public repos are accessible via `raw.githubusercontent.com`
-- **Binary files**: images referenced in HTML are loaded via absolute URL (they work); binary files opened directly show as plain text
-- **Very large files**: the entire file content is fetched client-side; extremely large HTML files may be slow to process
-- **CSS `@import`**: CSS files fetched and inlined do not recursively resolve their own `@import` statements yet
+| Limitation | Details |
+|------------|---------|
+| Private repositories | Not supported — only public repos are accessible via `raw.githubusercontent.com` |
+| Binary files | Images in HTML load fine via absolute URL; binary files opened directly render as plain text |
+| Large files | Content is fetched entirely client-side; very large HTML files may be slow |
+| CSS `@import` | Inlined CSS files do not yet recursively resolve their own `@import` statements |
 
 ---
 
-## TODO
+## Roadmap
 
 - [ ] Recursive `@import` resolution inside fetched CSS files
-- [ ] Support for files inside GitHub Gists
 - [ ] Syntax highlighting for plain text / code files (CSS, XML, JS, etc.)
-- [ ] Dark/light mode toggle
+- [ ] Dark / light mode toggle
 - [ ] Copy shareable link button
-- [ ] Support for branch/tag selector when only owner/repo/file is given
-- [ ] Handle HTML files that load CSS via JavaScript (dynamic injection)
-- [ ] Navigation breadcrumb showing current file path within the repo
+- [ ] Branch or tag selector
+- [ ] Handle CSS injected dynamically via JavaScript
+- [ ] Navigation breadcrumb showing the current file path within the repo
+- [ ] Support for GitHub Gists
 
 ---
 
 ## License
 
-MIT
+[MIT](LICENSE)
