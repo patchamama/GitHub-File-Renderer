@@ -89,37 +89,37 @@ https://raw.githubusercontent.com/owner/repo/branch/path/to/file.html
 
 ## Examples
 
-| Type | URL |
-|------|-----|
-| HTML site with CSS + JS | `https://github.com/patchamama/Hapkido-Taekwondo-Trainingsvideos/blob/main/index.html` |
-| Password-protected HTML | `https://github.com/patchamama/Hapkido-Taekwondo-Trainingsvideos/blob/main/docs/index.html` |
-| Markdown with image links | `https://github.com/patchamama/Hapkido-Taekwondo-Trainingsvideos/blob/main/README.md` |
+| Type                      | URL                                                                                         |
+| ------------------------- | ------------------------------------------------------------------------------------------- |
+| HTML site with CSS + JS   | `https://github.com/patchamama/Interactive-Video-Navigator/blob/main/subtitles.show.html`   |
+| Password-protected HTML   | `https://github.com/patchamama/Hapkido-Taekwondo-Trainingsvideos/blob/main/docs/index.html` |
+| Markdown with image links | `https://raw.githubusercontent.com/patchamama/preguntas-entrevista-react/main/README.md`    |
 
 ---
 
 ## Supported file types
 
-| Extension | How it renders |
-|-----------|----------------|
-| `.html`, `.htm` | Full render — inlined CSS/JS, resolved assets, in-repo link navigation |
-| `.md`, `.markdown` | Rendered with `marked` — images and links resolved to raw GitHub URLs |
-| `.css` | Displayed as plain text |
-| `.xml` | Displayed as plain text |
-| Everything else | Displayed as plain text |
+| Extension          | How it renders                                                         |
+| ------------------ | ---------------------------------------------------------------------- |
+| `.html`, `.htm`    | Full render — inlined CSS/JS, resolved assets, in-repo link navigation |
+| `.md`, `.markdown` | Rendered with `marked` — images and links resolved to raw GitHub URLs  |
+| `.css`             | Displayed as plain text                                                |
+| `.xml`             | Displayed as plain text                                                |
+| Everything else    | Displayed as plain text                                                |
 
 ---
 
 ## Tech stack
 
-| Tool | Purpose |
-|------|---------|
-| React 19 + TypeScript | UI framework |
-| Vite | Build tool |
-| Tailwind CSS + Typography plugin | Styling |
-| TanStack Query | Fetching and caching remote files |
-| `marked` | Markdown rendering |
-| Web Crypto API (`crypto.subtle`) | SHA-256 password verification |
-| GitHub Actions | Automated deployment to GitHub Pages |
+| Tool                             | Purpose                              |
+| -------------------------------- | ------------------------------------ |
+| React 19 + TypeScript            | UI framework                         |
+| Vite                             | Build tool                           |
+| Tailwind CSS + Typography plugin | Styling                              |
+| TanStack Query                   | Fetching and caching remote files    |
+| `marked`                         | Markdown rendering                   |
+| Web Crypto API (`crypto.subtle`) | SHA-256 password verification        |
+| GitHub Actions                   | Automated deployment to GitHub Pages |
 
 ---
 
@@ -161,12 +161,12 @@ Alternatively, the included `.github/workflows/deploy.yml` supports deploying vi
 
 ## Known limitations
 
-| Limitation | Details |
-|------------|---------|
-| Private repositories | Not supported — only public repos are accessible via `raw.githubusercontent.com` |
-| Binary files | Images in HTML load fine via absolute URL; binary files opened directly render as plain text |
-| Large files | Content is fetched entirely client-side; very large HTML files may be slow |
-| CSS `@import` | Inlined CSS files do not yet recursively resolve their own `@import` statements |
+| Limitation           | Details                                                                                      |
+| -------------------- | -------------------------------------------------------------------------------------------- |
+| Private repositories | Not supported — only public repos are accessible via `raw.githubusercontent.com`             |
+| Binary files         | Images in HTML load fine via absolute URL; binary files opened directly render as plain text |
+| Large files          | Content is fetched entirely client-side; very large HTML files may be slow                   |
+| CSS `@import`        | Inlined CSS files do not yet recursively resolve their own `@import` statements              |
 
 ---
 
