@@ -1,18 +1,6 @@
 import { resolveAssetUrl } from './asset-resolver'
 import { parseGithubUrl } from './github-url-parser'
 
-const NAV_INJECTION = `
-<script>
-(function() {
-  document.addEventListener('click', function(e) {
-    var el = e.target.closest('a[data-github-nav]');
-    if (!el) return;
-    e.preventDefault();
-    window.parent.postMessage({ type: 'GITHUB_NAV', url: el.getAttribute('data-github-raw') }, '*');
-  });
-})();
-</script>
-`
 
 function rewriteStyleContent(css: string, repoBase: string, filePath: string): string {
   return css.replace(/url\(['"]?([^'")\s]+)['"]?\)/g, (_, url: string) => {
@@ -188,10 +176,20 @@ export function rewriteHtmlWithInlinedAssets(
     }
   })
 
-  // Inject nav script
-  const div = doc.createElement('div')
-  div.innerHTML = NAV_INJECTION
-  doc.body.appendChild(div.firstChild!)
+  // Inject nav script — create the element directly to avoid TextNode firstChild bug
+  const navScript = doc.createElement('script')
+  navScript.textContent = `
+(function() {
+  document.addEventListener('click', function(e) {
+    var el = e.target.closest('a[data-github-nav]');
+    if (!el) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    window.parent.postMessage({ type: 'GITHUB_NAV', url: el.getAttribute('data-github-raw') }, '*');
+  }, true);
+})();
+`
+  doc.body.appendChild(navScript)
 
   return '<!DOCTYPE html>\n' + doc.documentElement.outerHTML
 }
