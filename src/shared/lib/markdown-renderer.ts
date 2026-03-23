@@ -54,6 +54,23 @@ hljs.registerLanguage('plaintext', plaintext)
 import { resolveAssetUrl } from './asset-resolver'
 import { parseGithubUrl } from './github-url-parser'
 
+/**
+ * Generates a heading ID following GitHub's algorithm:
+ * lowercase, strip punctuation except hyphens, replace spaces with hyphens.
+ * Preserves accented characters (á, é, ñ, etc.) so Spanish anchors work.
+ */
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    // Strip HTML tags (headings can contain inline elements from marked)
+    .replace(/<[^>]+>/g, '')
+    // Remove characters that are not letters, digits, spaces or hyphens
+    // \p{L} matches any Unicode letter (covers á, é, ñ, ü, etc.)
+    .replace(/[^\p{L}\p{N}\s-]/gu, '')
+    .trim()
+    .replace(/\s+/g, '-')
+}
+
 export function renderMarkdown(
   raw: string,
   repoBase: string,
@@ -86,8 +103,19 @@ export function renderMarkdown(
     return `<div class="code-block">${langLabel}${copyBtn}<pre><code class="hljs ${language ?? ''}">${highlighted}</code></pre></div>`
   }
 
+  renderer.heading = ({ text, depth }: { text: string; depth: number }) => {
+    const id = slugify(text)
+    return `<h${depth} id="${id}">${text}</h${depth}>\n`
+  }
+
   renderer.link = ({ href, title, text }: { href: string; title?: string | null; text: string }) => {
     const titleAttr = title ? ` title="${title}"` : ''
+
+    // Internal anchor link — keep as-is so the browser scrolls within the page
+    if (href.startsWith('#')) {
+      return `<a href="${href}"${titleAttr}>${text}</a>`
+    }
+
     if (/^https?:\/\//.test(href)) {
       const parsed = parseGithubUrl(href)
       if (parsed) {
@@ -95,6 +123,7 @@ export function renderMarkdown(
       }
       return `<a href="${href}" target="_blank" rel="noopener noreferrer"${titleAttr}>${text}</a>`
     }
+
     const resolved = resolveAssetUrl(href, repoBase, currentFilePath)
     const ext = href.split('?')[0].split('.').pop()?.toLowerCase() ?? ''
     const navExts = ['html', 'htm', 'md', 'markdown']
