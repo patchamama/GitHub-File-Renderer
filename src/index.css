@@ -6,7 +6,34 @@ body {
   margin: 0;
 }
 
-/* Code block wrapper with language badge */
+/* ── Prose font family via CSS variable ─────────────────────────── */
+.prose {
+  font-family: var(--prose-font, ui-sans-serif, system-ui, sans-serif);
+}
+
+/* ── Inline code (<code> not inside <pre>) ──────────────────────── */
+.prose :not(pre) > code {
+  background-color: var(--inline-code-bg, #e8eaed);
+  font-family: var(--inline-code-font, ui-monospace, monospace);
+  padding: 0.15em 0.4em;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  font-weight: 500;
+  color: inherit;
+}
+
+/* Remove the backtick quotes added by @tailwindcss/typography */
+.prose :not(pre) > code::before,
+.prose :not(pre) > code::after {
+  content: none !important;
+}
+
+/* dark mode default inline code bg when no custom value set */
+.dark .prose :not(pre) > code {
+  background-color: var(--inline-code-bg, #1e293b);
+}
+
+/* ── Code block wrapper ─────────────────────────────────────────── */
 .code-block {
   position: relative;
   margin: 1.25rem 0;
@@ -16,17 +43,66 @@ body {
   margin: 0 !important;
   border-radius: 0.5rem;
   overflow-x: auto;
+  padding-top: 2rem !important; /* room for the top bar */
 }
 
+/* Language label — bottom-left */
 .hljs-lang-label {
   position: absolute;
-  top: 0.4rem;
-  right: 0.6rem;
-  font-size: 0.7rem;
+  bottom: 0.45rem;
+  left: 0.7rem;
+  font-size: 0.68rem;
   font-family: ui-monospace, monospace;
   color: #8b949e;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   pointer-events: none;
   z-index: 1;
+}
+
+/* ── Copy button ────────────────────────────────────────────────── */
+.copy-code-btn {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.55rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: none;
+  border-radius: 0.35rem;
+  background: transparent;
+  color: #8b949e;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s, color 0.15s;
+}
+
+.code-block:hover .copy-code-btn {
+  opacity: 1;
+}
+
+.copy-code-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #e6edf3;
+}
+
+/* icon swap */
+.copy-code-btn .check-icon {
+  display: none;
+  color: #3fb950;
+}
+
+.copy-code-btn.copied {
+  opacity: 1;
+}
+
+.copy-code-btn.copied .copy-icon {
+  display: none;
+}
+
+.copy-code-btn.copied .check-icon {
+  display: block;
 }

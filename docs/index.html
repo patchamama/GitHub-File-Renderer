@@ -5,8 +5,20 @@
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GitHub File Renderer</title>
-    <script type="module" crossorigin src="./assets/index-YcZv5zVz.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-OqozYPS8.css">
+    <!-- Prevent dark-mode flash: apply class before first paint -->
+    <script>
+      (function () {
+        try {
+          var s = JSON.parse(localStorage.getItem('github-renderer-settings') || '{}')
+          var mode = s.state && s.state.darkMode
+          if (mode === 'dark' || (mode !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+          }
+        } catch (e) {}
+      })()
+    </script>
+    <script type="module" crossorigin src="./assets/index-BoSmV0z-.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DItY_wR_.css">
   </head>
   <body>
     <div id="root"></div>
