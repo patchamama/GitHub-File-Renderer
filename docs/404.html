@@ -4,15 +4,10 @@
   <meta charset="utf-8">
   <title>GitHub File Renderer</title>
   <script>
-    // GitHub Pages SPA redirect
-    var seg = window.location.pathname.replace('/GitHub-File-Renderer', '');
-    var query = window.location.search.slice(1);
-    var hash = window.location.hash.slice(1);
-    window.location.replace(
-      window.location.origin + '/GitHub-File-Renderer/' +
-      (query ? '?' + query : '') +
-      (hash ? '#' + hash : '')
-    );
+    // GitHub Pages SPA redirect — works regardless of repo name or custom domain
+    var query = window.location.search;
+    var hash = window.location.hash;
+    window.location.replace(window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/') + query + hash);
   </script>
 </head>
 <body></body>
