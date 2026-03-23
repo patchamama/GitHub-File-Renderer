@@ -105,7 +105,9 @@ export function renderMarkdown(
 
   renderer.heading = ({ text, depth }: { text: string; depth: number }) => {
     const id = slugify(text)
-    return `<h${depth} id="${id}">${text}</h${depth}>\n`
+    // text is raw — parse inline markdown so `code`, **bold**, etc. render correctly
+    const rendered = marked.parseInline(text, { renderer }) as string
+    return `<h${depth} id="${id}">${rendered}</h${depth}>\n`
   }
 
   renderer.link = ({ href, title, text }: { href: string; title?: string | null; text: string }) => {
