@@ -31,9 +31,32 @@ GitHub's built-in viewer only shows raw source or a bare-bones preview — it wa
 
 ## How it works
 
-```
-GitHub URL  →  resolve to raw URL  →  fetch HTML  →  detect & fetch dependencies
-    →  inline CSS / JS  →  rewrite asset URLs  →  render in sandboxed iframe
+```mermaid
+flowchart TD
+    A([User pastes a GitHub URL]) --> B[Parse & normalize\nto raw.githubusercontent.com]
+    B --> C[Fetch file content\nvia CORS]
+    C --> D{File type?}
+
+    D -->|HTML| E{Password\nprotected?}
+    D -->|Markdown| M[Render with marked\nResolve images & links]
+    D -->|Other| N[Display as plain text]
+
+    E -->|Yes| F[Show password prompt\nVerify SHA-256 hash]
+    F -->|Wrong password| F
+    F -->|Correct| G
+    E -->|No| G[Parse HTML\nDetect dependencies]
+
+    G --> H[Fetch all CSS & JS files\nin parallel]
+    H --> I[Inline CSS → style tags\nInline JS → script tags]
+    I --> J[Rewrite asset URLs\nimages · video · audio]
+    J --> K[Intercept internal links\nmark as in-repo navigation]
+    K --> L[Inject into\nsandboxed iframe]
+
+    M --> L
+    N --> L
+
+    L --> O([Rendered page])
+    O -->|User clicks\nan internal link| B
 ```
 
 1. The URL is parsed and normalized to a `raw.githubusercontent.com` address
