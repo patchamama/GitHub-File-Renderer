@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { renderMarkdown } from '../../../shared/lib/markdown-renderer'
 import type { ParsedGithubUrl } from '../../../shared/types/github'
+import 'highlight.js/styles/github-dark-dimmed.css'
 
 interface Props {
   content: string
